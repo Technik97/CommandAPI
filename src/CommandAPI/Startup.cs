@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
 using CommandAPI.Data;
 
 namespace CommandAPI
@@ -20,6 +22,9 @@ namespace CommandAPI
             services.AddControllers();
 
             services.AddScoped<ICommandAPIRepo, MockCommandAPIRepo>();
+
+            services.AddDbContext<CommandContext>(opt => opt.UseNpgsql
+                        (Configuration.GetConnectionString("PostgreSqlConnection")));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,6 +41,13 @@ namespace CommandAPI
             {
                 endpoints.MapControllers();
             });
+        }
+
+        public IConfiguration Configuration { get; }
+
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
         }
     }
 }
