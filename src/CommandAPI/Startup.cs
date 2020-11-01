@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using CommandAPI.Data;
 
 namespace CommandAPI
@@ -23,8 +24,16 @@ namespace CommandAPI
 
             services.AddScoped<ICommandAPIRepo, SqlCommandAPIRepo>();
 
+
+
+            var builder = new NpgsqlConnectionStringBuilder();
+            builder.ConnectionString =
+                        Configuration.GetConnectionString("PostgreSqlConnection");
+            builder.Username = Configuration["UserID"];
+            builder.Password = Configuration["Password"];
+
             services.AddDbContext<CommandContext>(opt => opt.UseNpgsql
-                        (Configuration.GetConnectionString("PostgreSqlConnection")));
+                        (builder.ConnectionString));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
